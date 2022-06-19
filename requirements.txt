@@ -1,0 +1,7 @@
+lxml
+natsort
+gensim
+keras
+tensorflow
+numpy
+javaobj-py3
