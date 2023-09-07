@@ -1,5 +1,6 @@
 import os
 import sys
+import timeit
 
 from argparse import ArgumentParser
 from natsort import natsorted
@@ -61,13 +62,19 @@ def parse_arguments():
 
 
 def process_texts(inpath, outpath, informat, resolver, threshold, model_path):
-    model = utils.initialize_neural_model(conf.NEURAL_MODEL_ARCHITECTURE, conf.NUMBER_OF_FEATURES, model_path)
     if os.path.isdir(inpath):
-        process_directory(inpath, outpath, informat, resolver, threshold, model)
+        process_directory(inpath, outpath, informat, resolver, threshold, model_path)
     elif os.path.isfile(inpath):
-        process_text(inpath, outpath, informat, resolver, threshold, model)
+        process_text(inpath, outpath, informat, resolver, threshold, model_path)
     else:
         eprint("Error: Specified input does not exist!")
+
+def one_text(filename, model, inpath, outpath, resolver='all2all', informat='tei', treshold=0.85):
+    textname = os.path.splitext(os.path.basename(filename))[0]
+    textoutput = os.path.join(outpath, textname)
+    textinput = os.path.join(inpath, filename)
+    model = utils.initialize_neural_model(conf.NEURAL_MODEL_ARCHITECTURE, conf.NUMBER_OF_FEATURES, model)
+    process_text(textinput, textoutput, informat, resolver, treshold, model)
 
 
 def process_directory(inpath, outpath, informat, resolver, threshold, model):
@@ -77,11 +84,15 @@ def process_directory(inpath, outpath, informat, resolver, threshold, model):
     files = os.listdir(inpath)
     files = natsorted(files)
 
-    for filename in files:
-        textname = os.path.splitext(os.path.basename(filename))[0]
-        textoutput = os.path.join(outpath, textname)
-        textinput = os.path.join(inpath, filename)
-        process_text(textinput, textoutput, informat, resolver, threshold, model)
+    # for filename in files:
+    import multiprocessing
+    from itertools import repeat
+    pool_obj = multiprocessing.Pool(processes=1)
+
+    answer = pool_obj.starmap(
+        one_text, zip(files, repeat(model), repeat(inpath), repeat(outpath))
+        )
+
 
 
 def process_text(inpath, outpath, informat, resolver, threshold, model):

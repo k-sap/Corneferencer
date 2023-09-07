@@ -14,7 +14,7 @@ W2V_MODEL_NAME = 'w2v_allwiki_nkjpfull_50.model'
 # simple or siamese
 NEURAL_MODEL_ARCHITECTURE = 'simple'
 NUMBER_OF_FEATURES = 1190
-NEURAL_MODEL_NAME = 'model_1147_features.h5'
+NEURAL_MODEL_NAME = 'model_1190_features.h5'
 
 FREQ_LIST_NAME = 'base.lst'
 LEMMA2SYNONYMS_NAME = 'lemma2synonyms.map'
@@ -27,6 +27,7 @@ TITLE2REDIRECT_NAME = 'redirect.map'
 MAIN_PATH = os.path.dirname(__file__)
 
 W2V_MODEL_PATH = os.path.join(MAIN_PATH, 'models', W2V_MODEL_NAME)
+print(W2V_MODEL_PATH)
 W2V_MODEL = Word2Vec.load(W2V_MODEL_PATH)
 
 NEURAL_MODEL_PATH = os.path.join(MAIN_PATH, 'models', NEURAL_MODEL_NAME)

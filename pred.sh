@@ -1,0 +1,1 @@
+python ./main.py --input "/home/ksaputa/mspace/dataset/dataset/PCC-1.5-TEI-split/plotkarzyna_herbert_large_preds" --model "models/model_1190_features.h5" --output "/home/ksaputa/mspace/Corneferencer/plotkarzyna_herbert_large" -f "tei"
