@@ -1,1 +1,1 @@
-python ./main.py --input "/home/ksaputa/mspace/dataset/dataset/PCC-1.5-TEI-split/plotkarzyna_herbert_large_preds" --model "models/model_1190_features.h5" --output "/home/ksaputa/mspace/Corneferencer/plotkarzyna_herbert_large" -f "tei"
+docker run --rm --gpus 0 -v ./Corneferencer/docker_corneferencer_volume/:/app/data corneferencer --input /app/data/one_text --output /app/data/one_text_pred  --model "/app/models/model_1190_features.h5"  -f "tei" --resolver all2all 

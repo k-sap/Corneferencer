@@ -1,4 +1,5 @@
 import numpy
+from tqdm import tqdm
 
 from corneferencer.resolvers import features, vectors
 
@@ -21,7 +22,7 @@ def siamese(text, threshold, neural_model):
                     ana_vec.extend(pair_features)
                     ana_sample = numpy.asarray([ana_vec], dtype=numpy.float32)
 
-                    prediction = neural_model.predict([ante_sample, ana_sample])[0]
+                    prediction = neural_model.predict([ante_sample, ana_sample], verbose=0)[0]
 
                     if prediction < threshold:
                         if ante.set:
@@ -37,7 +38,7 @@ def siamese(text, threshold, neural_model):
 # incremental resolve algorithm
 def incremental(text, threshold, neural_model):
     last_set_id = 0
-    for i, ana in enumerate(text.mentions):
+    for i, ana in enumerate(tqdm(text.mentions)):
         if i > 0:
             best_prediction = 0.0
             best_ante = None
@@ -45,7 +46,7 @@ def incremental(text, threshold, neural_model):
                 if not features.pair_intersect(ante, ana):
                     pair_vec = vectors.get_pair_vector(ante, ana)
                     sample = numpy.asarray([pair_vec], dtype=numpy.float32)
-                    prediction = neural_model.predict(sample)[0]
+                    prediction = neural_model.predict(sample, verbose=0)[0]
                     if prediction > threshold and prediction >= best_prediction:
                         best_prediction = prediction
                         best_ante = ante
@@ -63,7 +64,7 @@ def incremental(text, threshold, neural_model):
 def all2all(text, threshold, neural_model):
     last_set_id = 0
     sets = text.get_sets()
-    for pos1, mnt1 in enumerate(text.mentions):
+    for pos1, mnt1 in enumerate(tqdm(text.mentions)):
         best_prediction = 0.0
         best_link = None
         for pos2, mnt2 in enumerate(text.mentions):
@@ -74,7 +75,7 @@ def all2all(text, threshold, neural_model):
                 ana = mnt2
                 pair_vec = vectors.get_pair_vector(ante, ana)
                 sample = numpy.asarray([pair_vec], dtype=numpy.float32)
-                prediction = neural_model.predict(sample)[0]
+                prediction = neural_model.predict(sample, verbose=0)[0]
                 if prediction > threshold and prediction > best_prediction:
                     best_prediction = prediction
                     best_link = mnt2
@@ -99,7 +100,7 @@ def all2all(text, threshold, neural_model):
 def entity_based(text, threshold, neural_model):
     sets = []
     last_set_id = 0
-    for i, ana in enumerate(text.mentions):
+    for i, ana in enumerate(tqdm(text.mentions)):
         if i > 0:
             best_fit = get_best_set(sets, ana, threshold, neural_model)
             if best_fit is not None:
@@ -139,7 +140,7 @@ def predict_set(mentions, ana, neural_model):
         if not features.pair_intersect(mnt, ana):
             pair_vec = vectors.get_pair_vector(mnt, ana)
             sample = numpy.asarray([pair_vec], dtype=numpy.float32)
-            prediction = neural_model.predict(sample)[0]
+            prediction = neural_model.predict(sample, verbose=0)[0]
         prediction_sum += prediction
     return prediction_sum / float(len(mentions))
 
@@ -159,7 +160,7 @@ def closest(text, threshold, neural_model):
                 if not features.pair_intersect(ante, ana):
                     pair_vec = vectors.get_pair_vector(ante, ana)
                     sample = numpy.asarray([pair_vec], dtype=numpy.float32)
-                    prediction = neural_model.predict(sample)[0]
+                    prediction = neural_model.predict(sample, verbose=0)[0]
                     if prediction > threshold:
                         if ante.set:
                             ana.set = ante.set

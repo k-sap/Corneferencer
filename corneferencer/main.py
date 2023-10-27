@@ -1,9 +1,11 @@
 import os
 import sys
 import timeit
+import traceback
 
 from argparse import ArgumentParser
 from natsort import natsorted
+from tqdm import tqdm
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -73,9 +75,14 @@ def one_text(filename, model, inpath, outpath, resolver='all2all', informat='tei
     textname = os.path.splitext(os.path.basename(filename))[0]
     textoutput = os.path.join(outpath, textname)
     textinput = os.path.join(inpath, filename)
-    model = utils.initialize_neural_model(conf.NEURAL_MODEL_ARCHITECTURE, conf.NUMBER_OF_FEATURES, model)
-    process_text(textinput, textoutput, informat, resolver, treshold, model)
-
+    print(textinput)
+    #model = utils.initialize_neural_model(conf.NEURAL_MODEL_ARCHITECTURE, conf.NUMBER_OF_FEATURES, model)
+    try:
+        process_text(textinput, textoutput, informat, resolver, treshold, model)
+    except Exception as e:
+        print(textinput)
+        print(e)
+        traceback.print_exc()
 
 def process_directory(inpath, outpath, informat, resolver, threshold, model):
     inpath = os.path.abspath(inpath)
@@ -88,11 +95,14 @@ def process_directory(inpath, outpath, informat, resolver, threshold, model):
     import multiprocessing
     from itertools import repeat
     pool_obj = multiprocessing.Pool(processes=1)
-
-    answer = pool_obj.starmap(
-        one_text, zip(files, repeat(model), repeat(inpath), repeat(outpath))
-        )
-
+    model = utils.initialize_neural_model(conf.NEURAL_MODEL_ARCHITECTURE, conf.NUMBER_OF_FEATURES, model)
+#    answer = pool_obj.starmap(
+#        one_text, zip(files, repeat(model), repeat(inpath),
+#            repeat(outpath), repeat(resolver), repeat(informat),
+#            repeat(threshold))
+#        )
+    for p in tqdm(files):
+        one_text(p, model, inpath, outpath, resolver, informat, threshold)
 
 
 def process_text(inpath, outpath, informat, resolver, threshold, model):
@@ -112,9 +122,9 @@ def process_text(inpath, outpath, informat, resolver, threshold, model):
             resolve.all2all(text, threshold, model)
         mmax.write(inpath, outpath, text)
     elif informat == 'tei':
-        print (basename)
+        #print (basename)
         text = tei.read(inpath)
-        print(text)
+        #print(text)
         # print(text.get_sets())
         if resolver == 'incremental':
             resolve.incremental(text, threshold, model)
