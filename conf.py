@@ -14,7 +14,7 @@ W2V_MODEL_NAME = 'w2v_allwiki_nkjpfull_50.model'
 # simple or siamese
 NEURAL_MODEL_ARCHITECTURE = 'simple'
 NUMBER_OF_FEATURES = 1190
-NEURAL_MODEL_NAME = 'model_1190_features.h5'
+NEURAL_MODEL_NAME = '' # 'model_1147_features.h5'
 
 FREQ_LIST_NAME = 'base.lst'
 LEMMA2SYNONYMS_NAME = 'lemma2synonyms.map'

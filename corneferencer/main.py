@@ -76,7 +76,7 @@ def one_text(filename, model, inpath, outpath, resolver='all2all', informat='tei
     textoutput = os.path.join(outpath, textname)
     textinput = os.path.join(inpath, filename)
     print(textinput)
-    #model = utils.initialize_neural_model(conf.NEURAL_MODEL_ARCHITECTURE, conf.NUMBER_OF_FEATURES, model)
+    model = utils.initialize_neural_model(conf.NEURAL_MODEL_ARCHITECTURE, conf.NUMBER_OF_FEATURES, model)
     try:
         process_text(textinput, textoutput, informat, resolver, treshold, model)
     except Exception as e:
@@ -95,7 +95,6 @@ def process_directory(inpath, outpath, informat, resolver, threshold, model):
     import multiprocessing
     from itertools import repeat
     pool_obj = multiprocessing.Pool(processes=1)
-    model = utils.initialize_neural_model(conf.NEURAL_MODEL_ARCHITECTURE, conf.NUMBER_OF_FEATURES, model)
 #    answer = pool_obj.starmap(
 #        one_text, zip(files, repeat(model), repeat(inpath),
 #            repeat(outpath), repeat(resolver), repeat(informat),
